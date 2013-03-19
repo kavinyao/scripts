@@ -15,13 +15,13 @@ fi
 
 if [ $# -eq 1 ]; then
     # display line number of output ...in a haphazard way
-    grep --color=always "$1" -r . | nl -w 1 -s '] ' | sed 's/^/[/'
+    grep --color=always "$1" -r . | nl -w 2 -s '] ' | sed 's/^/[/'
     exit 0
 fi
 
 if [ "$2" = "-s" ]; then
     # strip long lines
-    grep --color=always "$1" -r . | nl -w 1 -s '] ' | sed 's/^/[/' | awk '{if(length($0) <= 160) print}'
+    grep --color=always "$1" -r . | nl -w 2 -s '] ' | sed 's/^/[/' | awk '{if(length($0) <= 160) print}'
     exit 0
 fi
 
