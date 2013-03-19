@@ -2,6 +2,10 @@
 #author: kavinyao<kavinyao@gmail.com>
 #license: GPLv2
 
+# `vigor` is vi + grep
+# It recursively searches for the given string and prints a list of matching files, each with a number.
+# You can open the file you want with file number, either positive or negative (from bottom).
+
 if [ $# -lt 1 ]; then
     echo "vigor: recursive grep search and open specified one with vi"
     echo "Usage: vigor string_to_search [line]"
@@ -15,9 +19,10 @@ if [ $# -eq 1 ]; then
 fi
 
 if [ $2 -ge 0 ]; then
-    #out=$(grep "$1" -nr . | head -n $2 | tail -n 1 | awk -F: '{print $1" "$2}')
+    # the first n-th file
     out=$(grep "$1" -nr . | sed -n "$2p" | awk -F: '{print $1" "$2}')
 else
+    # the last n-th file
     line=$((-$2))
     out=$(grep "$1" -nr . | tail -n $2 | head -n 1 | awk -F: '{print $1" "$2}')
 fi
@@ -27,7 +32,9 @@ if [ -z "$out" ]; then
     exit 0
 fi
 
+# extract file name and line number
 filename=${out% *}
 line_number=${out##* }
+
 echo "opening $filename [$line_number]"
 vi $filename +$line_number
