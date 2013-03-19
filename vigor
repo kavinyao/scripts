@@ -1,0 +1,33 @@
+#!/bin/bash
+#author: kavinyao<kavinyao@gmail.com>
+#license: GPLv2
+
+if [ $# -lt 1 ]; then
+    echo "vigor: recursive grep search and open specified one with vi"
+    echo "Usage: vigor string_to_search [line]"
+    exit 1
+fi
+
+if [ $# -eq 1 ]; then
+    # display line number of output ...in a haphazard way
+    grep --color=always "$1" -r . | nl -w 1 -s '] ' | sed 's/^/[/'
+    exit 0
+fi
+
+if [ $2 -ge 0 ]; then
+    #out=$(grep "$1" -nr . | head -n $2 | tail -n 1 | awk -F: '{print $1" "$2}')
+    out=$(grep "$1" -nr . | sed -n "$2p" | awk -F: '{print $1" "$2}')
+else
+    line=$((-$2))
+    out=$(grep "$1" -nr . | tail -n $2 | head -n 1 | awk -F: '{print $1" "$2}')
+fi
+
+if [ -z "$out" ]; then
+    echo "No result found."
+    exit 0
+fi
+
+filename=${out% *}
+line_number=${out##* }
+echo "opening $filename [$line_number]"
+vi $filename +$line_number
