@@ -15,26 +15,29 @@ if [ $# -lt 1 ]; then
 fi
 
 # store search result
-res=$(grep --color=always "$1" -nr $line_num_flag .)
+res=$(grep --color=always "$1" -nr .)
+# no -n flag, otherwise would result in one less line for wc
 total_lines=$(echo "$res" | wc -l | tr -d ' ')
+# echo "Total lines: $total_lines"
 width=${#total_lines}
 
 if [ $# -eq 1 ]; then
     # output directly
-    echo "$res" | nl -w $width -s '] ' | sed 's/^/[/'
+    echo -n "$res" | nl -w $width -s '] ' | sed 's/^/[/'
     exit 0
 fi
 
 if [ "$2" = "-s" ]; then
     # strip ridiculously long lines
-    res=$(echo "$res" | awk -v limit=$LINE_CHARACTER_LIMIT $'{if(length($0) <= limit) print}')
-    # update total line number
+    res=$(echo -n "$res" | awk -v limit=$LINE_CHARACTER_LIMIT $'{if(length($0) <= limit) print}')
+    # no -n, same reason as above
     total_lines=$(echo "$res" | wc -l | tr -d ' ')
+    # echo "Total lines: $total_lines"
     width=${#total_lines}
 
     if [ $# -eq 2 ]; then
         # no more argument, output now
-        echo "$res" | nl -w $width -s '] ' | sed 's/^/[/'
+        echo -n "$res" | nl -w $width -s '] ' | sed 's/^/[/'
         exit 0
     fi
 fi
@@ -47,7 +50,8 @@ if [ $line_no -le 0 ]; then
     line_no=$(($total_lines+$line_no+1))
 fi
 
-line=$(echo "$res" | sed -n "$line_no"p | awk -F: '{print $1" "$2}')
+# echo "Will open [$line_no]"
+line=$(echo -n "$res" | sed -n "$line_no"p | awk -F: '{print $1" "$2}')
 if [ -z "$line" ]; then
     echo "No result found."
     exit 1
