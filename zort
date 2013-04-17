@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import sys
+import argparse
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='python implementation of UNIX sort')
+    parser.add_argument('-k', '--key', dest='key',
+        default='1', metavar='POS1[,POS2]', help='start a key at POS1, end it at POS2')
+    parser.add_argument('-r', '--reverse', dest='reverse',
+        nargs='?', const=True, default=False, help='reverse the result of comparisons')
+    args = parser.parse_args()
+
+    print args
+    if ',' in args.key:
+        pos1, pos2 = [int(p) for p in args.key.split()]
+    else:
+        pos1 = pos2 = int(args.key)
+
+    lines = sys.stdin.readlines()
+    lines.sort(key=lambda l: ' '.join(l.split()[pos1-1:pos2]), reverse=args.reverse)
+    for line in lines:
+        sys.stdout.write(line)
