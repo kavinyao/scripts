@@ -16,24 +16,33 @@ if __name__ == '__main__':
         default='1', metavar='POS1[,POS2]', help='start a key at POS1, end it at POS2')
     parser.add_argument('-r', '--reverse', dest='reverse',
         action='store_true', help='reverse the result of comparisons')
+    parser.add_argument('-f', '--ignore-case', dest='ignore_case',
+        action='store_true', help='fold lower case into upper case letters')
     parser.add_argument('-n', '--numeric-sort', dest='numeric',
         action='store_true', help='compare according to string numerical value')
 
     args = parser.parse_args()
-    print args
 
     if ',' in args.key:
         pos1, pos2 = [int(p) for p in args.key.split()]
     else:
         pos1 = pos2 = int(args.key)
 
-    lines = sys.stdin.readlines()
+    # process ignore_case before numeric to avoid casting
+
+    key_extractor = lambda s: ' '.join(s.split()[pos1-1:pos2])
+    if args.ignore_case:
+        # use ke instead of key_extractor to avoid undesirable recursion
+        ke = key_extractor
+        key_extractor = lambda s: ke(s).upper()
 
     if args.numeric:
-        key_func = lambda l: parse_numeric(' '.join(l.split()[pos1-1:pos2]))
-    else:
-        key_func = lambda l: ' '.join(l.split()[pos1-1:pos2])
+        # use ke instead of key_extractor to avoid undesirable recursion
+        ke = key_extractor
+        key_extractor = lambda s: parse_numeric(ke(s))
 
-    lines.sort(key=key_func, reverse=args.reverse)
+    lines = sys.stdin.readlines()
+
+    lines.sort(key=key_extractor, reverse=args.reverse)
     for line in lines:
         sys.stdout.write(line)
