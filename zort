@@ -12,6 +12,8 @@ def parse_numeric(s, default=0.0):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='python implementation of UNIX sort')
+    parser.add_argument('files', metavar='FILE', nargs='*',
+        help='files to read, will be concatenated')
     parser.add_argument('-k', '--key', dest='key',
         default='1', metavar='POS1[,POS2]', help='start a key at POS1, end it at POS2')
     parser.add_argument('-r', '--reverse', dest='reverse',
@@ -22,6 +24,7 @@ if __name__ == '__main__':
         action='store_true', help='compare according to string numerical value')
 
     args = parser.parse_args()
+    #print args
 
     if ',' in args.key:
         pos1, pos2 = [int(p) for p in args.key.split()]
@@ -41,7 +44,13 @@ if __name__ == '__main__':
         ke = key_extractor
         key_extractor = lambda s: parse_numeric(ke(s))
 
-    lines = sys.stdin.readlines()
+    if args.files:
+        lines = []
+        for f in args.files:
+            with open(f) as in_file:
+                lines.extend(in_file.readlines())
+    else:
+        lines = sys.stdin.readlines()
 
     lines.sort(key=key_extractor, reverse=args.reverse)
     for line in lines:
