@@ -1,3 +1,3 @@
 # Scripts
 
-A collection of scripts make life better.
+A collection of scripts that make life easier.
