@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Get ip address of current host on OS X
+ifconfig | grep netmask | grep broadcast | cut -d ' ' -f 2
