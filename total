@@ -1,0 +1,7 @@
+#!/bin/bash
+# compute sum of numberf from stdin
+# named as `total` because `sum` is the checksum command
+#author: kavinyao<kavinyao@gmail.com>
+#license: GPLv2
+
+awk '{sum += $1} END{print sum}'
